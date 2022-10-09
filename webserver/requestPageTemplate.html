@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html>
+<body>
+    <style>
+    table, th, td {
+        border:1px solid black;
+    }
+    td {
+        text-align: center;
+    }
+    tr:nth-child(odd) {background-color:aliceblue}
+    
+    </style>
+
+    <form action="/downloadSheet">
+    <table>
+        <tr>
+            <th style="width:11%">Student</th>
+            <th style="width:11%">Term</th>
+            <th style="width:11%">Term Post-Exam</th>
+            <th style="width:11%">Summative</th>
+            <th style="width:11%">Exam</th>
+            <th style="width:11%">Old Final</th>
+            <th style="width:11%">Final</th>
+            <th style="width:11%">Include Summary
+                <input type="checkbox" onclick="selectAll(this, 'Summary')"></input>
+            </th>
+            <th style="width:11%">Selected
+                <input type="checkbox" onclick="selectAll(this, 'Selected')"></input>
+            </th>
+            {{range $student := .Students}}
+                <tr>
+                <td>{{.LastName}}, {{.FirstName}}</td>
+                {{if ne .TermMark -1.0}}
+                    <td>{{printf "%.2f" .TermMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                {{if ne .ShadowedTermMark -1.0}}
+                <td>{{printf "%.2f" .ShadowedTermMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                {{if ne .SummativeMark -1.0}}
+                <td>{{printf "%.2f" .SummativeMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                {{if ne .ExamMark -1.0}}
+                <td>{{printf "%.2f" .ExamMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                {{if ne .UnshadowedFinalMark -1.0}}
+                <td>{{printf "%.2f" .UnshadowedFinalMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                {{if ne .ShadowedFinalMark -1.0}}
+                <td>{{printf "%.2f" .ShadowedFinalMark}}%</td>
+                {{else}}
+                    <td>No Mark</td>
+                {{end}}
+                <td><input class="Summary" type="checkbox" name=SUMMARY{{.Name}}></td>
+                <td><input class="Selected" type="checkbox" name=SELECTED{{.Name}}></td>
+                </tr>
+            {{end}}
+        </tr>
+    </table>
+    <input type="submit" value="One PDF report for all selected students" style = "font-size:15pt" formaction="/singlePDF">
+    <input type="submit" value="Indiviudal PDF reports for all selected students" style = "font-size:15pt" formaction="/manyPDF">
+    <input type="submit" value="Get Class Report (Spreadsheet)" style = "font-size:15pt">
+    <p><h2>{{if .LandscapeOption}}Landscape<input class="Landscape" type="checkbox" name=LANDSCAPE>{{end}}</h2></p>
+
+    </form>
+
+    <script>
+        function selectAll(element, className) {
+            const checkboxes = document.getElementsByClassName(className);
+            const state = element.checked;
+            for (var i = 0; i < checkboxes.length; i++) {
+                checkboxes[i].checked = state;
+            }
+        }
+    </script>
+
+</body>
+</html>
