@@ -202,7 +202,7 @@ func purgeExtraLevels(student model.Student, course model.Course) model.Student 
 				toPurge := true
 				for j := 0; j < len(c.MarksInOrder); j++ {
 					if student.Marks[expectation.Evaluations[i].ID] == c.MarksInOrder[j] ||
-						c.LetterToNumeric[student.StrandLetterMarks[strand.Name]] == math.MaxFloat64 {
+						c.LetterToNumeric[student.Marks[expectation.Evaluations[i].ID]] == math.MaxFloat64 {
 						toPurge = false
 						break
 					}
