@@ -126,12 +126,14 @@ func calculateFinalMark(student model.Student) float64 {
 		}
 		return totalMark / totalWeight
 	} else {
-		if student.ExamMark == -1 {
+		if student.ExamMark == -1 && student.SummativeMark == -1 {
 			return student.TermMark
+		} else if student.ExamMark == -1 {
+			return student.TermMark*0.7 + student.SummativeMark*0.3
 		} else if student.SummativeMark == -1 {
 			return student.TermMark*0.7 + student.ExamMark*0.3
 		} else {
-			return student.TermMark*0.7 + student.ExamMark*0.2 + student.SummativeMark*0.1
+			return student.TermMark*+student.ExamMark*0.2 + student.SummativeMark*0.1
 		}
 	}
 }
