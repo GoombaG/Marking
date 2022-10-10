@@ -24,7 +24,6 @@
             }
             h1 {
                 font-size: 25pt;
-
             }
             .center {
                 display: block;
@@ -1871,13 +1870,9 @@
     <h1>Student: {{$student.FirstName}} {{$student.LastName}}</h1>
     <h1>Teacher: {{$.Course.Teacher}}</h1>
     <h1 style="font-size: 20pt";>Key:</h1>
-    <b>
-       <div style="font-size: 14pt; color:#0FBF00; display: inline">O.X: Overall Strand&nbsp;&nbsp;&nbsp;&nbsp;</div>
-       <div style="font-size: 14pt; color:#8200BE; display: inline">Q: Quiz&nbsp;&nbsp;&nbsp;&nbsp;</div>
-       <div style="font-size: 14pt; color:#FF0000; display: inline">T: Test&nbsp;&nbsp;&nbsp;&nbsp;</div>
-       <div style="font-size: 14pt; color:#FF55ED; display: inline">P: Project/Task&nbsp;&nbsp;&nbsp;&nbsp;</div>
-       <div style="font-size: 14pt; color:#0000FF; display: inline">E: Exam&nbsp;&nbsp;&nbsp;&nbsp;</div>
-       <div style="font-size: 14pt; color:#000000; display: inline">S: Summative&nbsp;&nbsp;&nbsp;&nbsp;</div></b>
+    {{range $shortform, $markType := $.Course.MarkTypes}}
+    <div style="font-size: 14pt;  display: inline; color: {{$markType.Colour}};">{{$shortform}}: {{$markType.Name}}&nbsp;&nbsp;&nbsp;&nbsp;</div>
+    {{end}}
     <div style="page-break-after: always"></div>
 
     <body style="font-family:'Times New Roman', Times, serif; font-size: 7pt; text-align: left;"></body>

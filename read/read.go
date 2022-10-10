@@ -43,6 +43,11 @@ func ReadSheet(sheet string) ([]model.Student, model.Course, string) {
 		return nil, newCourse, errorString
 	}
 
+	newCourse, errorString = readMarkTypes(f, newCourse)
+	if errorString != "" {
+		return nil, newCourse, errorString
+	}
+
 	newCourse.Strands, errorString = readExpectations(f, newCourse.Strands)
 	if errorString != "" {
 		return nil, newCourse, errorString
@@ -183,6 +188,9 @@ func readMarkTypes(f *excelize.File, course model.Course) (model.Course, string)
 	if errorString != "" {
 		return course, errorString
 	}
+	row++
+
+	course.MarkTypes = make(map[string]model.Print)
 
 	for {
 		var newMarkType model.Print
@@ -195,7 +203,30 @@ func readMarkTypes(f *excelize.File, course model.Course) (model.Course, string)
 		}
 		newMarkType.Name = newType
 
-		newColour, errorString := cell.GetStyle
+		typeCellName, err := excelize.CoordinatesToCellName(column+1, row)
+		if err != nil {
+			errorString := fmt.Sprintf("Error: %v, trouble converting coordinates to cell name", err)
+			return course, errorString
+		}
+		newStyle, err := f.GetCellStyle(f.GetSheetName(0), typeCellName)
+		if err != nil {
+			errorString := fmt.Sprintf("Error: %v, could not obtain style for cell", typeCellName)
+			return course, errorString
+		}
+		fontID := f.Styles.CellXfs.Xf[newStyle].FontID
+		newColour := f.Styles.Fonts.Font[*fontID].Color.RGB
+		if newColour == "" {
+			newColour = "FF000000"
+		}
+		newMarkType.Colour = "#" + newColour[2:]
+
+		newShortform, errorString := readCellFromCoordinates(f, column+1, row)
+		if errorString != "" {
+			return course, errorString
+		}
+
+		course.MarkTypes[newShortform] = newMarkType
+		row++
 	}
 }
 
@@ -253,23 +284,8 @@ func readEvaluations(f *excelize.File, students []model.Student, course model.Co
 		}
 		newEvaluation.Type = newType
 
-		switch newEvaluation.Type {
-		case "Q":
-			newEvaluation.Colour = "#8200BE" // PURPLE
-			break
-		case "E":
-			newEvaluation.Colour = "#0000FF" // BLUE
-			break
-		case "T":
-			newEvaluation.Colour = "#FF0000" // RED
-			break
-		case "S":
-			newEvaluation.Colour = "#000000" // BLACK
-			break
-		case "P":
-			newEvaluation.Colour = "#FF55ED" // PINK
-			break
-		default:
+		newEvaluation.Colour = course.MarkTypes[newEvaluation.Type].Colour
+		if newEvaluation.Colour == "" {
 			errorString := fmt.Sprintf("Error: evaluation \"%s\" has an invalid type \"%s\"", newKey, newEvaluation.Type)
 			return students, course, errorString
 		}
