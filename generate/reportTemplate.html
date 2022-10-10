@@ -1898,7 +1898,7 @@
                                             {{if eq $expectation.Name "Overall"}}
                                                 {{$mark := index $student.StrandLetterMarks $strandKey}}
                                                 {{if eq $mark $markType}}
-                                                    <b><span style="font-family:Verdana, Geneva, Tahoma, sans-serif; color: #0FBF00;">O.{{$strandKey}}</span></b>
+                                                    <b><span style="font-family:Verdana, Geneva, Tahoma, sans-serif; color: {{with $n := index $.Course.MarkTypes "O.X"}}{{$n.Colour}}{{end}}">O.{{$strandKey}}</span></b>
                                                 {{end}}
                                             {{end}}
                                             {{range $evaluation := $expectation.Evaluations}}
