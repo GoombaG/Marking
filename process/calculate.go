@@ -193,7 +193,7 @@ func purgeExtraLevels(student model.Student, course model.Course) model.Student 
 			numericMark := c.LetterToNumeric[student.StrandLetterMarks[strandKey]]
 			newMark := purgedLetterMark(numericMark)
 			for newMark == "ERROR" {
-				numericMark++
+				numericMark--
 				newMark = purgedLetterMark(numericMark)
 			}
 			student.StrandLetterMarks[strandKey] = newMark
