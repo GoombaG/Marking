@@ -1895,7 +1895,7 @@
                                     <th>{{$expectation.Name}}</th>
                                     {{range $markType := $.MarkTypes}}
                                         <td>
-                                            {{if eq $expectation.Name "Overall"}}
+                                            {{if eq $expectation.Name "Overall Strand"}}
                                                 {{$mark := index $student.StrandLetterMarks $strandKey}}
                                                 {{if eq $mark $markType}}
                                                     <b><span style="font-family:Verdana, Geneva, Tahoma, sans-serif; color: {{with $n := index $.Course.MarkTypes "O.X"}}{{$n.Colour}}{{end}}">O.{{$strandKey}}</span></b>
