@@ -12,5 +12,5 @@ Unzip the folder, navigate to “main” in the command prompt at "Marking-main\
 
 This can be moved anywhere and renamed.
 
-## Using the program
+# Using the program
 https://docs.google.com/document/d/1bcVo0q9VzyKnrT-E9rxYU-KqXEH5RS04S2u7a4T30Gw/edit?usp=sharing
