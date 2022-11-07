@@ -1,6 +1,7 @@
 package process
 
 import (
+	"fmt"
 	"math"
 
 	c "github.com/GoombaG/Marking/data"
@@ -178,26 +179,9 @@ func calculateShadowedMarks(student model.Student, course model.Course) (float64
 	return student.TermMark, calculateFinalMark(student)
 }
 
+// Removes ignored levels so they aren't displayed on reports
 func purgeExtraLevels(student model.Student, course model.Course) model.Student {
-	for strandKey, strand := range course.Strands {
-		toPurge := true
-		for j := 0; j < len(c.MarksInOrder); j++ {
-			if student.StrandLetterMarks[strandKey] == c.MarksInOrder[j] ||
-				student.StrandLetterMarks[strandKey] == "" {
-				toPurge = false
-				break
-			}
-		}
-
-		if toPurge {
-			numericMark := c.LetterToNumeric[student.StrandLetterMarks[strandKey]]
-			newMark := purgedLetterMark(numericMark)
-			for newMark == "ERROR" {
-				numericMark--
-				newMark = purgedLetterMark(numericMark)
-			}
-			student.StrandLetterMarks[strandKey] = newMark
-		}
+	for _, strand := range course.Strands {
 
 		for _, expectation := range strand.Expectations {
 			for i := 0; i < len(expectation.Evaluations); i++ {
@@ -213,10 +197,6 @@ func purgeExtraLevels(student model.Student, course model.Course) model.Student 
 				if toPurge {
 					numericMark := c.LetterToNumeric[student.Marks[expectation.Evaluations[i].ID]]
 					newMark := purgedLetterMark(numericMark)
-					for newMark == "ERROR" {
-						numericMark--
-						newMark = purgedLetterMark(numericMark)
-					}
 					student.Marks[expectation.Evaluations[i].ID] = newMark
 				}
 			}
@@ -229,21 +209,23 @@ func purgeExtraLevels(student model.Student, course model.Course) model.Student 
 func purgedLetterMark(mark float64) string {
 	diff := 1000.0
 	letterMark := "ERROR"
-	for key, element := range c.LetterToNumeric {
-
-		toPurge := true
-		for j := 0; j < len(c.MarksInOrder); j++ {
-			if key == c.MarksInOrder[j] {
-				toPurge = false
-				break
+	for letterMark == "ERROR" {
+		for key, element := range c.LetterToNumeric {
+			toPurge := true
+			for j := 0; j < len(c.MarksInOrder); j++ {
+				if key == c.MarksInOrder[j] {
+					toPurge = false
+					break
+				}
 			}
-		}
 
-		if toPurge || element < mark || math.Abs(element-mark) > diff {
-			continue
+			if toPurge || ((math.Abs(element-mark)) >= 1 && (element < mark)) || math.Abs(element-mark) > diff {
+				continue
+			}
+			diff = math.Abs(element - mark)
+			letterMark = key
 		}
-		diff = math.Abs(element - mark)
-		letterMark = key
+		mark--
 	}
 	return letterMark
 }
@@ -256,22 +238,9 @@ func calculateLetterStrandMarks(student model.Student) map[string]string {
 		if mark == -1 {
 			student.StrandLetterMarks[key] = ""
 		} else {
-			student.StrandLetterMarks[key] = numericToLetter(mark)
+			student.StrandLetterMarks[key] = purgedLetterMark(mark)
 		}
 	}
+	fmt.Println(student.StrandLetterMarks)
 	return student.StrandLetterMarks
-}
-
-// Converts a numeric mark to the closest letter mark that is equal to or above the numeric mark
-func numericToLetter(mark float64) string {
-	diff := 1000.0
-	letterMark := "ERROR"
-	for key, element := range c.LetterToNumeric {
-		if element < mark || math.Abs(element-mark) > diff {
-			continue
-		}
-		diff = math.Abs(element - mark)
-		letterMark = key
-	}
-	return letterMark
 }
